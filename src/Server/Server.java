@@ -15,7 +15,8 @@ public class Server {
     private static final int PORTNUM = 8081;
     private ServerSocket serverSocket;
     private List<PlayerHandler> playerList = new ArrayList<>();
-    private String word = "PICHA";
+    private String word;
+    private int numPlayers = 2;
 
     public Server() {
         try {
@@ -45,15 +46,33 @@ public class Server {
                 PrintWriter writer = new PrintWriter(player.clientSocket.getOutputStream(), true);
                 if (!p.equals(player)) {
                     writer.println(message);
-                    writer.write("=====================\n");
-                    writer.write(">>>>>  YOU LOSE  <<<<<\n");
-                    writer.write("=====================\n");
+                    writer.write(
+                            " /$$     /$$                        /$$                                     /$$      \n" +
+                            "|  $$   /$$/                       | $$                                    | $$      \n" +
+                            " \\  $$ /$$//$$$$$$  /$$   /$$      | $$  /$$$$$$   /$$$$$$$  /$$$$$$       | $$      \n" +
+                            "  \\  $$$$//$$__  $$| $$  | $$      | $$ /$$__  $$ /$$_____/ /$$__  $$      | $$      \n" +
+                            "   \\  $$/| $$  \\ $$| $$  | $$      | $$| $$  \\ $$|  $$$$$$ | $$$$$$$$      |__/      \n" +
+                            "    | $$ | $$  | $$| $$  | $$      | $$| $$  | $$ \\____  $$| $$_____/                \n" +
+                            "    | $$ |  $$$$$$/|  $$$$$$/      | $$|  $$$$$$/ /$$$$$$$/|  $$$$$$$       /$$      \n" +
+                            "    |__/  \\______/  \\______/       |__/ \\______/ |_______/  \\_______/      |__/      \n" +
+                            "                                                                                     \n" +
+                            "                                                                                     \n" +
+                            "                                                                                     ");
                     writer.flush();
                     continue;
                 }
-                writer.write("=====================\n");
-                writer.write(">>>>>  YOU WIN  <<<<<\n");
-                writer.write("=====================\n");
+                writer.write(
+                        " /$$     /$$                                      /$$                 /$$      \n" + "|  $$   /$$/                                     |__/                | $$      \n" +
+                        " \\  $$ /$$//$$$$$$  /$$   /$$       /$$  /$$  /$$ /$$ /$$$$$$$       | $$      \n" +
+                        "  \\  $$$$//$$__  $$| $$  | $$      | $$ | $$ | $$| $$| $$__  $$      | $$      \n" +
+                        "   \\  $$/| $$  \\ $$| $$  | $$      | $$ | $$ | $$| $$| $$  \\ $$      |__/      \n" +
+                        "    | $$ | $$  | $$| $$  | $$      | $$ | $$ | $$| $$| $$  | $$                \n" +
+                        "    | $$ |  $$$$$$/|  $$$$$$/      |  $$$$$/$$$$/| $$| $$  | $$       /$$      \n" +
+                        "    |__/  \\______/  \\______/        \\_____/\\___/ |__/|__/  |__/      |__/      \n" +
+                        "                                                                               \n" +
+                        "                                                                               \n" +
+                        "                                                                               ");
+
                 writer.flush();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -101,10 +120,27 @@ public class Server {
                 this.prompt = new Prompt(clientSocket.getInputStream(), ps);
 
                 // ask for name
+                msgWriter.write(
+                        " /$$   /$$                                                                                                                  \n" +
+                                "| $$  | $$                                                                                                                  \n" +
+                                "| $$  | $$  /$$$$$$  /$$$$$$$   /$$$$$$  /$$$$$$/$$$$   /$$$$$$  /$$$$$$$         /$$$$$$   /$$$$$$  /$$$$$$/$$$$   /$$$$$$ \n" +
+                                "| $$$$$$$$ |____  $$| $$__  $$ /$$__  $$| $$_  $$_  $$ |____  $$| $$__  $$       /$$__  $$ |____  $$| $$_  $$_  $$ /$$__  $$\n" +
+                                "| $$__  $$  /$$$$$$$| $$  \\ $$| $$  \\ $$| $$ \\ $$ \\ $$  /$$$$$$$| $$  \\ $$      | $$  \\ $$  /$$$$$$$| $$ \\ $$ \\ $$| $$$$$$$$\n" +
+                                "| $$  | $$ /$$__  $$| $$  | $$| $$  | $$| $$ | $$ | $$ /$$__  $$| $$  | $$      | $$  | $$ /$$__  $$| $$ | $$ | $$| $$_____/\n" +
+                                "| $$  | $$|  $$$$$$$| $$  | $$|  $$$$$$$| $$ | $$ | $$|  $$$$$$$| $$  | $$      |  $$$$$$$|  $$$$$$$| $$ | $$ | $$|  $$$$$$$\n" +
+                                "|__/  |__/ \\_______/|__/  |__/ \\____  $$|__/ |__/ |__/ \\_______/|__/  |__/       \\____  $$ \\_______/|__/ |__/ |__/ \\_______/\n" +
+                                "                               /$$  \\ $$                                         /$$  \\ $$                                  \n" +
+                                "                              |  $$$$$$/                                        |  $$$$$$/                                  \n" +
+                                "                               \\______/                                          \\______/                                   ");
+                msgWriter.newLine();
+                msgWriter.newLine();
+                msgWriter.newLine();
+                msgWriter.flush();
                 StringInputScanner namePrompt = new StringInputScanner();
                 namePrompt.setMessage("Enter your username:");
                 String name = prompt.getUserInput(namePrompt);
                 Thread.currentThread().setName(name);
+                playerList.add(this);
                 cenas(msgWriter);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -135,24 +171,22 @@ public class Server {
                 }
 
             while(!clientSocket.isClosed()) {
+
+                while(playerList.size() != numPlayers){
+                    System.out.println("Waiting...");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 while (letters > 0) {
                     found = false;
                     StringBuilder hiddenWord = new StringBuilder();
                     for (int i = 0; i < lettersGuessed.length; i++) {
                         hiddenWord.append(lettersGuessed[i] + " ");
                     }
-                    writer.write(
-                            " /$$   /$$                                                                                                                  \n" +
-                                "| $$  | $$                                                                                                                  \n" +
-                                "| $$  | $$  /$$$$$$  /$$$$$$$   /$$$$$$  /$$$$$$/$$$$   /$$$$$$  /$$$$$$$         /$$$$$$   /$$$$$$  /$$$$$$/$$$$   /$$$$$$ \n" +
-                                "| $$$$$$$$ |____  $$| $$__  $$ /$$__  $$| $$_  $$_  $$ |____  $$| $$__  $$       /$$__  $$ |____  $$| $$_  $$_  $$ /$$__  $$\n" +
-                                "| $$__  $$  /$$$$$$$| $$  \\ $$| $$  \\ $$| $$ \\ $$ \\ $$  /$$$$$$$| $$  \\ $$      | $$  \\ $$  /$$$$$$$| $$ \\ $$ \\ $$| $$$$$$$$\n" +
-                                "| $$  | $$ /$$__  $$| $$  | $$| $$  | $$| $$ | $$ | $$ /$$__  $$| $$  | $$      | $$  | $$ /$$__  $$| $$ | $$ | $$| $$_____/\n" +
-                             "| $$  | $$|  $$$$$$$| $$  | $$|  $$$$$$$| $$ | $$ | $$|  $$$$$$$| $$  | $$      |  $$$$$$$|  $$$$$$$| $$ | $$ | $$|  $$$$$$$\n" +
-                                "|__/  |__/ \\_______/|__/  |__/ \\____  $$|__/ |__/ |__/ \\_______/|__/  |__/       \\____  $$ \\_______/|__/ |__/ |__/ \\_______/\n" +
-                             "                               /$$  \\ $$                                         /$$  \\ $$                                  \n" +
-                                "                              |  $$$$$$/                                        |  $$$$$$/                                  \n" +
-                                "                               \\______/                                          \\______/                                   ");
                     writer.newLine();
                     writer.newLine();
                     writer.newLine();
@@ -192,11 +226,13 @@ public class Server {
 
                         // se acertou a letra e ainda não a tinha descoberto
                         // então faz cenas
-                        if (!found) {
-                            for (int i = 0; i < lettersGuessed.length; i++) {
-                                if (word.charAt(i) == guess.charAt(0)) {
-                                    lettersGuessed[i] = guess;
-                                    letters--;
+                        synchronized (word) {
+                            if (!found) {
+                                for (int i = 0; i < lettersGuessed.length; i++) {
+                                    if (word.charAt(i) == guess.charAt(0)) {
+                                        lettersGuessed[i] = guess;
+                                        letters--;
+                                    }
                                 }
                             }
                         }
