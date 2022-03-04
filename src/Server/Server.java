@@ -14,7 +14,7 @@ public class Server {
     private static final int PORTNUM = 8081;
     private ServerSocket serverSocket;
     private List<PlayerHandler> playerList = new ArrayList<>();
-    private String word = "Picha";
+    private String word = "PICHA";
     private Prompt prompt;
 
     public Server() {
@@ -124,7 +124,7 @@ public class Server {
                     StringInputScanner messageP = new StringInputScanner();
                     messageP.setMessage("Enter your guess:");
                     String message = this.prompt.getUserInput(messageP);
-                    guess = message;
+                    guess = message.toUpperCase();
 
 
                     // Se escreveu + que uma letra, está a tentar adivinhar a palavra
