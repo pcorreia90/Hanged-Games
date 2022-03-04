@@ -9,13 +9,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Server {
     private static final int PORTNUM = 8081;
     private ServerSocket serverSocket;
     private List<PlayerHandler> playerList = new ArrayList<>();
     private String word = "PICHA";
-    private Prompt prompt;
 
     public Server() {
         try {
@@ -43,7 +43,7 @@ public class Server {
         for (PlayerHandler player : playerList) {
             try {
                 PrintWriter writer = new PrintWriter(player.clientSocket.getOutputStream(), true);
-                if(!p.equals(player)) {
+                if (!p.equals(player)) {
                     writer.println(message);
                     writer.write("=====================\n");
                     writer.write(">>>>>  YOU LOSE  <<<<<\n");
@@ -60,11 +60,34 @@ public class Server {
 
             }
         }
+
     }
+    private ArrayList<String> readFile () {
+        ArrayList<String> words = null;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("resources/words.txt"));
+            String line = "";
+            words = new ArrayList<>();
+            while ((line = reader.readLine()) != null) {
+                words.add(line);
+            }
+
+            System.out.println(words.size());
+            reader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return words;
+    }
+
 
     public class PlayerHandler implements Runnable{
         private Socket clientSocket;
         private Prompt prompt;
+        private ArrayList<String> words;
 
         public PlayerHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -89,6 +112,10 @@ public class Server {
         }
 
         public void cenas(BufferedWriter writer) throws IOException {
+
+                words = readFile();
+                word = words.get((int)(Math.random() * words.size())).toUpperCase();
+                System.out.println("Word to guess is: " + word);
                 boolean found;
                 String guess = "";
                 String[] lettersGuessed = new String[word.length()];
@@ -114,10 +141,22 @@ public class Server {
                     for (int i = 0; i < lettersGuessed.length; i++) {
                         hiddenWord.append(lettersGuessed[i] + " ");
                     }
-
-                    // _____,    _ = a
-
-                    writer.write(hiddenWord.toString());
+                    writer.write(
+                            " /$$   /$$                                                                                                                  \n" +
+                                "| $$  | $$                                                                                                                  \n" +
+                                "| $$  | $$  /$$$$$$  /$$$$$$$   /$$$$$$  /$$$$$$/$$$$   /$$$$$$  /$$$$$$$         /$$$$$$   /$$$$$$  /$$$$$$/$$$$   /$$$$$$ \n" +
+                                "| $$$$$$$$ |____  $$| $$__  $$ /$$__  $$| $$_  $$_  $$ |____  $$| $$__  $$       /$$__  $$ |____  $$| $$_  $$_  $$ /$$__  $$\n" +
+                                "| $$__  $$  /$$$$$$$| $$  \\ $$| $$  \\ $$| $$ \\ $$ \\ $$  /$$$$$$$| $$  \\ $$      | $$  \\ $$  /$$$$$$$| $$ \\ $$ \\ $$| $$$$$$$$\n" +
+                                "| $$  | $$ /$$__  $$| $$  | $$| $$  | $$| $$ | $$ | $$ /$$__  $$| $$  | $$      | $$  | $$ /$$__  $$| $$ | $$ | $$| $$_____/\n" +
+                             "| $$  | $$|  $$$$$$$| $$  | $$|  $$$$$$$| $$ | $$ | $$|  $$$$$$$| $$  | $$      |  $$$$$$$|  $$$$$$$| $$ | $$ | $$|  $$$$$$$\n" +
+                                "|__/  |__/ \\_______/|__/  |__/ \\____  $$|__/ |__/ |__/ \\_______/|__/  |__/       \\____  $$ \\_______/|__/ |__/ |__/ \\_______/\n" +
+                             "                               /$$  \\ $$                                         /$$  \\ $$                                  \n" +
+                                "                              |  $$$$$$/                                        |  $$$$$$/                                  \n" +
+                                "                               \\______/                                          \\______/                                   ");
+                    writer.newLine();
+                    writer.newLine();
+                    writer.newLine();
+                    writer.write("Word to guess is : " + hiddenWord.toString());
                     writer.newLine();
                     writer.flush();
 
@@ -167,6 +206,9 @@ public class Server {
                 System.exit(1);
             }
         }
+
+
+
         @Override
         public void run() {
             System.out.println("New client: "+ clientSocket);
