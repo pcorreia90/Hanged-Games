@@ -26,7 +26,7 @@ public class Server {
                 PlayerHandler player = new PlayerHandler(clientSocket);
                 Thread newThread = new Thread(player);
                 newThread.start();
-                Game
+                game = new Game();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -47,13 +47,11 @@ public class Server {
                 BufferedReader msgReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 while(!clientSocket.isClosed()){
                     message = msgReader.readLine();
-                    System.out.println(message);
+                    game.printMessage(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
 
         @Override
