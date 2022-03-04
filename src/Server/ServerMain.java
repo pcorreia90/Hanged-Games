@@ -2,7 +2,12 @@ package Server;
 
 public class ServerMain {
     public static void main(String[] args) {
-        Server newServer = new Server();
-        newServer.start();
+        if(args.length < 1) {
+            Server newServer = new Server("2");
+            newServer.start();
+        }else {
+            Server newServer = new Server(args[0]);
+            newServer.start();
+        }
     }
 }

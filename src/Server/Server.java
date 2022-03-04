@@ -15,10 +15,12 @@ public class Server {
     private static final int PORTNUM = 8081;
     private ServerSocket serverSocket;
     private List<PlayerHandler> playerList = new ArrayList<>();
-    private String word;
-    private int numPlayers = 2;
+    private ArrayList<String> words = readFile();
+    private String word= words.get((int)(Math.random() * words.size())).toUpperCase();
+    private int numPlayers;
 
-    public Server() {
+    public Server(String numP) {
+        this.numPlayers = Integer.parseInt(numP);
         try {
             serverSocket = new ServerSocket(PORTNUM);
         } catch (IOException e) {
@@ -33,7 +35,6 @@ public class Server {
                 PlayerHandler player = new PlayerHandler(clientSocket);
                 Thread newThread = new Thread(player);
                 newThread.start();
-                playerList.add(player);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -106,7 +107,6 @@ public class Server {
     public class PlayerHandler implements Runnable{
         private Socket clientSocket;
         private Prompt prompt;
-        private ArrayList<String> words;
 
         public PlayerHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -149,9 +149,14 @@ public class Server {
 
         public void cenas(BufferedWriter writer) throws IOException {
 
-                words = readFile();
-                word = words.get((int)(Math.random() * words.size())).toUpperCase();
                 System.out.println("Word to guess is: " + word);
+                while(playerList.size() != numPlayers){
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 boolean found;
                 String guess = "";
                 String[] lettersGuessed = new String[word.length()];
@@ -172,14 +177,6 @@ public class Server {
 
             while(!clientSocket.isClosed()) {
 
-                while(playerList.size() != numPlayers){
-                    System.out.println("Waiting...");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
 
                 while (letters > 0) {
                     found = false;
