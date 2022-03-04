@@ -158,7 +158,7 @@ public class Server {
                     }
                 }
                 boolean found;
-                String guess = "";
+                String guess;
                 String[] lettersGuessed = new String[word.length()];
 
                 int letters = word.length();
