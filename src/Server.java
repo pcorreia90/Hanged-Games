@@ -12,13 +12,16 @@ public class Server {
     private static final int PORTNUM = 8081;
     private ServerSocket serverSocket;
     private List<PlayerHandler> playerList = new ArrayList<>();
-    private ArrayList<String> words = readFile();
-    private String word;
+    private String path;
     private int numPlayers;
+    private ArrayList<String> words;
+    private String word;
     private boolean gameOver = false;
 
-    public Server(String numP) {
+    public Server(String numP, String path) {
         this.numPlayers = Integer.parseInt(numP);
+        this.path = path;
+        words = readFile();
         try {
             serverSocket = new ServerSocket(PORTNUM);
         } catch (IOException e) {
@@ -84,18 +87,22 @@ public class Server {
 
 
     private ArrayList<String> readFile () {
-        InputStream in = getClass().getResourceAsStream("words.txt");
-        ArrayList<String> words = null;
+        BufferedReader reader;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            words = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
-                words.add(line);
+            if(this.path == null){
+                InputStream in = getClass().getResourceAsStream("words.txt");
+                reader = new BufferedReader(new InputStreamReader(in));
+            }else {
+                reader = new BufferedReader(new FileReader(this.path));
             }
+                String line = "";
+                words = new ArrayList<>();
+                while ((line = reader.readLine()) != null) {
+                    words.add(line);
+                }
 
-            System.out.println(words.size());
-            reader.close();
+                System.out.println(words.size());
+                reader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
