@@ -1,10 +1,9 @@
-import jdk.internal.util.xml.impl.Input;
+
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,16 @@ public class Server {
             e.printStackTrace();
         }
         word = words.get((int)(Math.random() * words.size())).toUpperCase();
+        String ip = null;
+        try(final DatagramSocket socket = new DatagramSocket()){
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ip = socket.getLocalAddress().getHostAddress();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Tell you players to use the following command on their terminals: nc " + ip + " " + PORTNUM);
     }
 
     public void start() {
@@ -101,7 +110,7 @@ public class Server {
                     words.add(line);
                 }
 
-                System.out.println(words.size());
+                System.out.println("Total word count: " + words.size());
                 reader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -121,7 +130,7 @@ public class Server {
             this.clientSocket = clientSocket;
         }
 
-        public void showPlayerMsg() {
+        public void start() {
 
             try {
                 gameOver = false;
@@ -151,13 +160,13 @@ public class Server {
                 String name = prompt.getUserInput(namePrompt);
                 Thread.currentThread().setName(name);
                 playerList.add(this);
-                cenas(msgWriter);
+                gameLogic(msgWriter);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        public void cenas(BufferedWriter writer) throws IOException {
+        public void gameLogic(BufferedWriter writer) throws IOException {
 
                 System.out.println("Word to guess is: " + word);
                 while(playerList.size() != numPlayers){
@@ -249,12 +258,10 @@ public class Server {
             }
         }
 
-
-
         @Override
         public void run() {
             System.out.println("New client: "+ clientSocket);
-            showPlayerMsg();
+            start();
         }
     }
 }
