@@ -1,5 +1,4 @@
-package Server;
-
+import jdk.internal.util.xml.impl.Input;
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
 
@@ -13,7 +12,7 @@ public class Server {
     private static final int PORTNUM = 8081;
     private ServerSocket serverSocket;
     private List<PlayerHandler> playerList = new ArrayList<>();
-    private ArrayList<String> words = new ArrayList<>();
+    private ArrayList<String> words = readFile();
     private String word;
     private int numPlayers;
     private boolean gameOver = false;
@@ -25,7 +24,6 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        insertWords();
         word = words.get((int)(Math.random() * words.size())).toUpperCase();
     }
 
@@ -84,68 +82,27 @@ public class Server {
         gameOver = true;
     }
 
-    public void insertWords() {
-        words.add("zahgen");
-        words.add("adapta-te");
-        words.add("aproveita as oportunidades");
-        words.add("perdeste uma oportunidade");
-        words.add("java");
-        words.add("oop");
-        words.add("static");
-        words.add("instance");
-        words.add("enumerations");
-        words.add("composition");
-        words.add("inheritance");
-        words.add("polymorphism");
-        words.add("interfaces");
-        words.add("exceptions");
-        words.add("simplegfx");
-        words.add("containers");
-        words.add("collections");
-        words.add("nested");
-        words.add("classes");
-        words.add("input");
-        words.add("output");
-        words.add("network");
-        words.add("world wide web");
-        words.add("concurrent programming");
-        words.add("documentation");
-        words.add("conventions");
-        words.add("prompt");
-        words.add("super bock");
-        words.add("sagres é cocó");
-        words.add("git");
-        words.add("version");
-        words.add("bootcamp");
-        words.add("academia de codigo");
-        words.add("rolo");
-        words.add("raquel");
-        words.add("tio rolo");
-        words.add("velhinho");
-        words.add("homework");
-        words.add("summarizer");
-        words.add("francesinha");
-        words.add("sarmas");
-        words.add("telepizza");
-        words.add("bifanas");
-        words.add("filipe");
-        words.add("wagner");
-        words.add("puff manager");
-        words.add("mac");
-        words.add("rubberduck");
-        words.add("argicultores");
-        words.add("magnific0x");
-        words.add("magnific0x");
-        words.add("magnific0x");
-        words.add("magnific0x");
-        words.add("magnific0x");
-        words.add("johnny sins");
-        words.add("grande irmão");
-        words.add("gitlab");
-        words.add("basketball");
-        words.add("basquetball");
-        words.add("car crash");
-        words.add("toString");
+
+    private ArrayList<String> readFile () {
+        InputStream in = getClass().getResourceAsStream("words.txt");
+        ArrayList<String> words = null;
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            words = new ArrayList<>();
+            while ((line = reader.readLine()) != null) {
+                words.add(line);
+            }
+
+            System.out.println(words.size());
+            reader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return words;
     }
 
 
